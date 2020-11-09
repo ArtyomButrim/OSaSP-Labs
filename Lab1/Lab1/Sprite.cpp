@@ -146,6 +146,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			break;
+		case WM_MOUSEWHEEL:
+		{
+			short key = LOWORD(wParam);
+			short mouseWheel = HIWORD(wParam);
+
+			if (key == MK_SHIFT)
+			{
+				if (mouseWheel > 0)
+				{
+					MoveRight(hWnd);
+				}
+				else
+				{
+					MoveLeft(hWnd);
+				}
+			}
+			else
+			{
+				if (mouseWheel > 0)
+				{
+					MoveUp(hWnd);
+				}
+				else
+				{
+					MoveDown(hWnd);
+				}
+			}
+		}
+		break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
