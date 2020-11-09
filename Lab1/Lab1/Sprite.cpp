@@ -7,6 +7,9 @@
 TCHAR WinName[] = _T("WinFrame");
 
 HINSTANCE hInst;
+int left = 400;
+int top = 200;
+int size = 128;
 
 ATOM MyRegisterClass2(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
@@ -70,10 +73,79 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
+void DrawRectangle(HDC hdc, HBRUSH hBrush, HWND hWnd)
+{
+	SelectObject(hdc, hBrush);
+	Rectangle(hdc, left, top, left + size, top+size);
+	ValidateRect(hWnd, NULL);
+}
+void MoveLeft(HWND hWnd)
+{
+	left = left - 10;
+	InvalidateRect(hWnd, NULL, true);
+	UpdateWindow(hWnd);
+}
+
+void MoveUp(HWND hWnd)
+{
+	top = top - 10;
+	InvalidateRect(hWnd, NULL, true);
+	UpdateWindow(hWnd);
+}
+
+void MoveRight(HWND hWnd)
+{
+	left += 10;
+	InvalidateRect(hWnd, NULL, true);
+	UpdateWindow(hWnd);
+}
+
+void MoveDown(HWND hWnd)
+{
+	top += 10;
+	InvalidateRect(hWnd, NULL, true);
+	UpdateWindow(hWnd);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HANDLE hBitmap;
 	switch (message)
 	{
+		case WM_PAINT:
+		{
+			PAINTSTRUCT paint;
+			HBRUSH hBrush = CreateSolidBrush(RGB(0, 255, 0));
+			HDC hdc = BeginPaint(hWnd, &paint);
+			DrawRectangle(hdc, hBrush, hWnd);
+			EndPaint(hWnd, &paint);
+		}
+		break;
+		case WM_KEYDOWN:
+			switch(wParam)
+			{
+				case VK_LEFT:
+				{
+					MoveLeft(hWnd);
+					break;
+				}
+				case VK_UP:
+				{
+					MoveUp(hWnd);
+					break;
+				}
+				case VK_RIGHT:
+				{
+					MoveRight(hWnd);
+					break;
+				}
+				case VK_DOWN:
+				{
+					MoveDown(hWnd);
+					break;
+				}
+			}
+			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
