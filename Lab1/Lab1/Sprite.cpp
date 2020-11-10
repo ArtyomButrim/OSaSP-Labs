@@ -88,6 +88,16 @@ void MoveLeft(HWND hWnd)
 	left = left - 10;
 	InvalidateRect(hWnd, NULL, true);
 	UpdateWindow(hWnd);
+	if (left <= 0)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			left += 5;
+			InvalidateRect(hWnd, NULL, true);
+			Sleep(15);
+			UpdateWindow(hWnd);
+		}
+	}
 }
 
 void MoveUp(HWND hWnd)
@@ -95,6 +105,16 @@ void MoveUp(HWND hWnd)
 	top = top - 10;
 	InvalidateRect(hWnd, NULL, true);
 	UpdateWindow(hWnd);
+	if (top <= 0)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			top += 5;
+			InvalidateRect(hWnd, NULL, true);
+			Sleep(15);
+			UpdateWindow(hWnd);
+		}
+	}
 }
 
 void MoveRight(HWND hWnd)
@@ -102,6 +122,16 @@ void MoveRight(HWND hWnd)
 	left += 10;
 	InvalidateRect(hWnd, NULL, true);
 	UpdateWindow(hWnd);
+	if (left + size >= sx)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			left -= 5;
+			InvalidateRect(hWnd, NULL, true);
+			Sleep(15);
+			UpdateWindow(hWnd);
+		}
+	}
 }
 
 void MoveDown(HWND hWnd)
@@ -109,6 +139,16 @@ void MoveDown(HWND hWnd)
 	top += 10;
 	InvalidateRect(hWnd, NULL, true);
 	UpdateWindow(hWnd);
+	if (top+size >= sy)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			top -= 5;
+			InvalidateRect(hWnd, NULL, true);
+			Sleep(15);
+			UpdateWindow(hWnd);
+		}
+	}
 }
 
 void ShowImage(HDC hdc, HBITMAP hBitMap)
@@ -128,14 +168,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 		case WM_CREATE:
-			hBitMap = (HBITMAP)LoadImage(NULL, _T("D:\\Study\\Mushroom.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			hBitMap = (HBITMAP)LoadImage(NULL, _T("D:\\test.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 			break;
 		case WM_PAINT:
 		{
 			PAINTSTRUCT paint;
 			HBRUSH hBrush = CreateSolidBrush(RGB(0, 255, 0));
 			HDC hdc = BeginPaint(hWnd, &paint);
-			if (isImage == true)
+			if (isImage == false)
 			{
 				DrawRectangle(hdc, hBrush, hWnd);
 			}
