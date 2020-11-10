@@ -1,21 +1,25 @@
-#include <Windows.h>
+п»ї#include <Windows.h>
 #include <tchar.h>
-
+#include <SDKDDKVer.h>
+#include "commctrl.h"
 
 #define STRING_LENGTH 120
 
 TCHAR WinName[] = _T("WinFrame");
 
 HINSTANCE hInst;
+HBITMAP hBitMap;
 int left = 400;
 int top = 200;
 int size = 128;
+bool isImage = false;
+int sx, sy;
 
 ATOM MyRegisterClass2(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	MyRegisterClass2(hInstance);
 
@@ -32,7 +36,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		DispatchMessage(&msg);
 	}
 
-	return 0;
+	return (int)msg.wParam;
 }
 
 ATOM MyRegisterClass2(HINSTANCE hInstance)
@@ -60,7 +64,7 @@ ATOM MyRegisterClass2(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-	HWND hWnd = CreateWindow(WinName, _T("Каркас Windows-приложения"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_DESKTOP, NULL, hInstance, NULL);
+	HWND hWnd = CreateWindow(WinName, _T("РљР°СЂРєР°СЃ Windows-РїСЂРёР»РѕР¶РµРЅРёСЏ"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, HWND_DESKTOP, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
@@ -107,18 +111,40 @@ void MoveDown(HWND hWnd)
 	UpdateWindow(hWnd);
 }
 
+void ShowImage(HDC hdc, HBITMAP hBitMap)
+{
+	BITMAP bitMap;
+	HGDIOBJ oldBitMap;
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	oldBitMap = SelectObject(hdcMem, hBitMap);
+	GetObject(hBitMap, sizeof(bitMap), &bitMap);
+	BitBlt(hdc, left, top, left + size, top + size, hdcMem, 0, 0, SRCCOPY);
+	SelectObject(hdcMem, oldBitMap);
+	DeleteDC(hdcMem);
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	HANDLE hBitmap;
 	switch (message)
 	{
+		case WM_CREATE:
+			hBitMap = (HBITMAP)LoadImage(NULL, _T("D:\\Study\\Mushroom.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+			break;
 		case WM_PAINT:
 		{
 			PAINTSTRUCT paint;
 			HBRUSH hBrush = CreateSolidBrush(RGB(0, 255, 0));
 			HDC hdc = BeginPaint(hWnd, &paint);
-			DrawRectangle(hdc, hBrush, hWnd);
+			if (isImage == true)
+			{
+				DrawRectangle(hdc, hBrush, hWnd);
+			}
+			else
+			{
+				ShowImage(hdc, hBitMap);
+			}		
 			EndPaint(hWnd, &paint);
+			UpdateWindow(hWnd);
 		}
 		break;
 		case WM_KEYDOWN:
@@ -142,6 +168,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case VK_DOWN:
 				{
 					MoveDown(hWnd);
+					break;
+				}
+				case VK_SPACE:
+				{
+					if (isImage == false)
+					{
+						isImage = true;
+					}
+					else
+					{
+						isImage = false;
+					}
+					UpdateWindow(hWnd);
 					break;
 				}
 			}
@@ -175,8 +214,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
+		case WM_SIZE:
+		{
+			sx = LOWORD(lParam);
+			sy = HIWORD(lParam);
+		}
+		break;
 		case WM_DESTROY:
+		{
 			PostQuitMessage(0);
+		}
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
