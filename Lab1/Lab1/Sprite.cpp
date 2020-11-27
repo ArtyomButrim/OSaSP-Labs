@@ -227,12 +227,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case WM_MOUSEWHEEL:
 		{
-			short key = LOWORD(wParam);
-			short mouseWheel = HIWORD(wParam);
+			short key = GET_KEYSTATE_WPARAM(wParam);
+			short mouseWheel = GET_WHEEL_DELTA_WPARAM(wParam);
 
 			if (key == MK_SHIFT)
 			{
-				if (mouseWheel > 0)
+				if (mouseWheel < 0)
 				{
 					MoveRight(hWnd);
 				}
@@ -243,7 +243,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				if (mouseWheel > 0)
+				if (mouseWheel < 0)
 				{
 					MoveUp(hWnd);
 				}
